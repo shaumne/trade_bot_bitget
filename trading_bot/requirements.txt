@@ -1,0 +1,13 @@
+python-dotenv
+ccxt
+pandas
+numpy
+ta
+matplotlib
+python-telegram-bot
+schedule
+python-dateutil
+retry
+pytest
+pytest-mock
+boto3
