@@ -325,9 +325,13 @@ class TradingBot:
             # Get market data with indicators
             df = self.get_market_data(limit=100)
             
-            # Get the most recent candle
+            # Get the most recent candles
             latest = df.iloc[-1]
             prev = df.iloc[-2]
+            
+            # Check for crossover events in the latest candles
+            ema_crossover_recent = any(df['ema_crossover'].iloc[-3:] == 1)
+            macd_crossover_recent = any(df['macd_crossover'].iloc[-3:] == 1)
             
             # Get signal and current price
             signal = latest['signal']
@@ -337,8 +341,11 @@ class TradingBot:
             # Check open positions
             num_positions = self.check_open_positions()
             
-            # Log current state
+            # Log current state and indicators
             logger.info(f"Current price: {current_price}, Signal: {signal}, ATR: {atr_value}")
+            logger.info(f"EMA crossover recent: {ema_crossover_recent}, MACD crossover recent: {macd_crossover_recent}")
+            logger.info(f"EMA fast: {latest['ema_9']:.2f}, EMA slow: {latest['ema_21']:.2f}")
+            logger.info(f"MACD: {latest['macd']:.4f}, MACD Signal: {latest['macd_signal']:.4f}, MACD Diff: {latest['macd_diff']:.4f}")
             logger.info(f"Open positions: {num_positions}/{config.MAX_POSITIONS}, Trades today: {self.trades_today}/{config.MAX_TRADES_PER_DAY}")
             
             # Process signals
@@ -346,11 +353,24 @@ class TradingBot:
                 if self.can_open_new_trade():
                     logger.info("Opening LONG position based on EMA + MACD bullish crossover")
                     self.open_long_position(current_price, atr_value)
+                else:
+                    logger.warning("LONG signal detected but cannot open new trade. Check max positions or daily trade limit.")
+            
+            # Özel durum: EMA ve MACD yakın zamanda bullish sinyal vermişse ancak henüz signal==1 olmamışsa
+            elif ema_crossover_recent and macd_crossover_recent and not signal == 1:
+                logger.info("Detected recent EMA and MACD bullish crossovers, but no confirmed signal yet.")
+                if self.can_open_new_trade():
+                    logger.info("Opening LONG position based on recent EMA + MACD bullish crossovers")
+                    self.open_long_position(current_price, atr_value)
+                else:
+                    logger.warning("Recent bullish crossovers detected but cannot open new trade. Check max positions or daily trade limit.")
             
             elif signal == -1:  # Short signal
                 if self.can_open_new_trade():
                     logger.info("Opening SHORT position based on EMA + MACD bearish crossover")
                     self.open_short_position(current_price, atr_value)
+                else:
+                    logger.warning("SHORT signal detected but cannot open new trade. Check max positions or daily trade limit.")
             
             # Check for exit conditions
             for position in self.open_positions:
@@ -368,7 +388,7 @@ class TradingBot:
         
         except Exception as e:
             error_msg = f"Error in trading iteration: {e}"
-            logger.error(error_msg)
+            logger.error(error_msg, exc_info=True)  # exc_info=True ekleyerek stack trace gösterilmesini sağlıyoruz
             self.notifier.send_error_notification(error_msg)
     
     def run(self, interval=60):

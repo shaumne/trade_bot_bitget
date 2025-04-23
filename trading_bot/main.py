@@ -92,8 +92,8 @@ def parse_arguments():
     
     # Trading bot command
     trade_parser = subparsers.add_parser('trade', help='Run the trading bot')
-    trade_parser.add_argument('--interval', type=int, default=60,
-                             help='Interval between trading iterations in seconds (default: 60)')
+    trade_parser.add_argument('--interval', type=int, default=5,
+                             help='Interval between trading iterations in seconds (default: 30)')
     
     # Backtest command
     backtest_parser = subparsers.add_parser('backtest', help='Run a backtest of the trading strategy')

@@ -105,10 +105,16 @@ def get_strategy_signals(df):
     df['signal'] = 0
     
     # Long signal: EMA bullish crossover AND MACD bullish crossover
-    long_condition = (df['ema_crossover'] == 1) & (df['macd_crossover'] == 1)
+    # Geliştirilmiş versiyon: Son 3 mum içinde her iki sinyal de bullish olduğunda
+    ema_bullish_recent = df['ema_crossover'].rolling(window=3).sum() > 0
+    macd_bullish_recent = df['macd_crossover'].rolling(window=3).sum() > 0
+    long_condition = ema_bullish_recent & macd_bullish_recent
     
     # Short signal: EMA bearish crossover AND MACD bearish crossover
-    short_condition = (df['ema_crossover'] == -1) & (df['macd_crossover'] == -1)
+    # Geliştirilmiş versiyon: Son 3 mum içinde her iki sinyal de bearish olduğunda
+    ema_bearish_recent = df['ema_crossover'].rolling(window=3).sum() < 0
+    macd_bearish_recent = df['macd_crossover'].rolling(window=3).sum() < 0
+    short_condition = ema_bearish_recent & macd_bearish_recent
     
     # Exit long: EMA bearish crossover AND MACD bearish crossover
     exit_long_condition = (df['ema_crossover'] == -1) & (df['macd_crossover'] == -1)

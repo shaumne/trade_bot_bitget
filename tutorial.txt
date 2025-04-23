@@ -1,0 +1,57 @@
+# Bitget Trading Bot Kullanım Kılavuzu (Ubuntu)
+Bu dökümanda, Ubuntu üzerinde çalışan Bitget Trading Bot'u temel yönetim adımları anlatılmaktadır.
+1. Bot Dizinine Geçiş
+Bot kodları /home/ubuntu/trade_bot_bitget/trading_bot klasöründe bulunmaktadır. Bu klasöre geçmek için:
+cd /home/ubuntu/trade_bot_bitget/trading_bot
+2. .env Dosyasını Düzenleme
+Bot ayarlarınızı ve API anahtarlarınızı .env dosyasında saklamanız gerekir. Dosyayı düzenlemek için nano editörünü kullanabilirsiniz:
+nano .env
+Dosya içinde aşağıdaki bilgileri düzenlemeniz gerekir:
+BITGET_API_KEY, BITGET_API_SECRET, BITGET_API_PASSPHRASE: Bitget hesabınızdan elde ettiğiniz API anahtarları
+EMAIL_RECIPIENT, EMAIL_SENDER, EMAIL_PASSWORD: Bildirimler için e-posta ayarları
+Düzenlemeleri yaptıktan sonra CTRL+X tuşlarına basın, ardından Y ve Enter ile dosyayı kaydedin.
+3. Bot Servisini Yönetme
+Bot, sistemde bir servis olarak çalışmaktadır. Aşağıdaki komutlarla yönetebilirsiniz:
+Servis Durumunu Kontrol Etme
+sudo systemctl status trading-bot
+Bu komut size botun çalışıp çalışmadığını gösterecektir. Yeşil "active (running)" yazısı, botun aktif olduğunu gösterir.
+Servisi Yeniden Başlatma
+API anahtarlarını değiştirdikten sonra botu yeniden başlatmanız gerekir:
+sudo systemctl restart trading-bot
+Servisi Durdurma
+sudo systemctl stop trading-bot
+Servisi Başlatma
+sudo systemctl start trading-bot
+Servis Yapılandırmasını Yenileme
+Service dosyasında bir değişiklik yaptıysanız, aşağıdaki komutu çalıştırın:
+sudo systemctl daemon-reload
+4. Log Dosyalarını İzleme
+Botun çalışmasını ve olası hataları görmek için log dosyalarını kontrol edebilirsiniz:
+tail -f /home/ubuntu/trade_bot_bitget/trading_bot/logs/trading_bot_.log
+Bu komut, en son log dosyasının içeriğini canlı olarak gösterecektir. Çıkmak için CTRL+C tuşlarına basın.
+5. Backtest Çalıştırma
+Stratejinizi gerçek parayla test etmeden önce backtesting yapabilirsiniz:
+cd /home/ubuntu/trade_bot_bitget/trading_bot
+source venv/bin/activate
+python main.py backtest
+Backtest sonuçları, backtest_results klasöründe oluşturulacaktır.
+6. Temel Sorun Giderme
+Bot Çalışmıyorsa
+Servis durumunu kontrol edin:
+sudo systemctl status trading-bot
+Hata mesajlarını görmek için logları kontrol edin:
+tail -f /home/ubuntu/trade_bot_bitget/trading_bot/logs/trading_bot_.log
+.env dosyasında API anahtarlarının doğru olduğundan emin olun:
+nano /home/ubuntu/trade_bot_bitget/trading_bot/.env
+Botu yeniden başlatın:
+sudo systemctl restart trading-bot
+API Anahtarlarını Değiştirdikten Sonra
+API anahtarlarını değiştirdikten sonra mutlaka botu yeniden başlatın:
+sudo systemctl restart trading-bot
+7. Yardımcı Terminal Komutları
+Şu anki dizini göster: pwd
+Dizin içeriğini listele: ls -la
+Bilgisayarı yeniden başlat: sudo reboot
+Bir dosyanın içeriğini görüntüle: cat dosyaadi
+Ekranı temizle: clear
+Bu dökümanda belirtilen tüm adımları sırasıyla izleyerek Bitget Trading Bot'u sorunsuz bir şekilde kullanabilirsiniz. Herhangi bir sorunla karşılaşırsanız, lütfen destek ekibiyle iletişime geçin."
